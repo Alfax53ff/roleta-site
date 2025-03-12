@@ -1,2 +1,0 @@
-# roleta-site
-roleta-site

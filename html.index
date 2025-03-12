@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roleta Online</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+        }
+        .roleta-container {
+            position: relative;
+        }
+        .roleta {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 5px solid white;
+            transition: transform 3s ease-out;
+        }
+        .pino {
+            width: 20px;
+            height: 20px;
+            background: red;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="roleta-container">
+        <div class="pino"></div>
+        <canvas id="roleta" class="roleta"></canvas>
+    </div>
+    <button onclick="girarRoleta()">GIRAR</button>
+    <p id="resultado"></p>
+    
+    <script>
+        const canvas = document.getElementById("roleta");
+        const ctx = canvas.getContext("2d");
+        canvas.width = canvas.height = 300;
+        const setores = ["Perdeu", "1000", "7000", "5000", "10,00", "Perdeu", "20.000", "30.000", "Prêmio Especial"];
+        const cores = ["red", "green", "blue", "orange", "purple", "red", "cyan", "yellow", "lime"];
+        let anguloAtual = 0;
+        let rodando = false;
+
+        function desenharRoleta() {
+            const anguloSetor = (2 * Math.PI) / setores.length;
+            setores.forEach((setor, i) => {
+                ctx.beginPath();
+                ctx.fillStyle = cores[i];
+                ctx.moveTo(150, 150);
+                ctx.arc(150, 150, 150, anguloSetor * i, anguloSetor * (i + 1));
+                ctx.lineTo(150, 150);
+                ctx.fill();
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.font = "14px Arial";
+                ctx.fillText(setor, 150 + Math.cos(anguloSetor * (i + 0.5)) * 100, 150 + Math.sin(anguloSetor * (i + 0.5)) * 100);
+            });
+        }
+        desenharRoleta();
+
+        function girarRoleta() {
+            if (rodando) return;
+            rodando = true;
+            let voltas = Math.floor(Math.random() * 10) + 5;
+            let anguloFinal = anguloAtual + voltas * 360 + Math.floor(Math.random() * 360);
+            let indice = Math.floor((360 - (anguloFinal % 360)) / (360 / setores.length)) % setores.length;
+            document.getElementById("resultado").innerText = "Girando...";
+            canvas.style.transform = `rotate(${anguloFinal}deg)`;
+            setTimeout(() => {
+                document.getElementById("resultado").innerText = `Resultado: ${setores[indice]}`;
+                rodando = false;
+                anguloAtual = anguloFinal % 360;
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
